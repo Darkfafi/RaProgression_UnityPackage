@@ -1,0 +1,19 @@
+{
+  "name": "rasofiagames.raprogression",
+  "displayName": "RaProgression",
+  "version": "1.0.0",
+  "unity": "2019.4",
+  "description": "A package which adds progress tracking tools to the project. This can be used for Loading Screens, Cooldowns and other progress related functionalities.",
+  "keywords": [
+    "Progress",
+    "Loading",
+    "Management",
+    "Data",
+	"Duration",
+	"Cooldown"
+  ],
+  "author": {
+    "name": "Rasofia Games"
+  },
+  "type": "tool"
+}
