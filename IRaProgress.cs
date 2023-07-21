@@ -2,7 +2,7 @@
 
 namespace RaProgression
 {
-	public interface IRaProgress
+	public interface IRaProgress : IDisposable
 	{
 		public event Action<IRaProgress> ProgressedEvaluatedEvent;
 		public event Action<IRaProgress> ProgressStartedEvent;
