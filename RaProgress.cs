@@ -58,6 +58,13 @@ namespace RaProgression
 			return this;
 		}
 
+		public RaProgress OnEnd(Action<IRaProgress> callback)
+		{
+			ProgressCancelledEvent += callback;
+			ProgressCompletedEvent += callback;
+			return this;
+		}
+
 		public RaProgress OnReset(Action<IRaProgress> callback)
 		{
 			ProgressResetEvent += callback;
@@ -70,7 +77,7 @@ namespace RaProgression
 			{
 				if(throwIfNotValid)
 				{
-					throw new InvalidOperationException($"Can't {nameof(Start)} {nameof(RaProgress)} which is not in {nameof(RaProgressState)} {nameof(RaProgressState.None)} (is not in {State}). Be sure to call {nameof(Reset)} if in use / used");
+					throw new InvalidOperationException($"Can't {nameof(Start)} {nameof(RaProgress)} which is not in {nameof(RaProgressState)} {nameof(RaProgressState.None)} (is now in {State}). Be sure to call {nameof(Reset)} if in use / used");
 				}
 				return false;
 			}
@@ -125,7 +132,7 @@ namespace RaProgression
 			{
 				if(throwIfNotValid)
 				{
-					throw new InvalidOperationException($"Can't {nameof(Start)} {nameof(RaProgress)} which is in {nameof(RaProgressState)} {nameof(RaProgressState.None)} (is not in {State}). Be sure to call {nameof(Reset)} only when the object has been used");
+					throw new InvalidOperationException($"Can't {nameof(Start)} {nameof(RaProgress)} which is in {nameof(RaProgressState)} {nameof(RaProgressState.None)} (is now in {State}). Be sure to call {nameof(Reset)} only when the object has been used");
 				}
 				return false;
 			}
@@ -159,7 +166,7 @@ namespace RaProgression
 			{
 				if(throwException)
 				{
-					throw new InvalidOperationException($"Can't {operation} {nameof(RaProgress)} which is not in {nameof(RaProgressState)} {nameof(RaProgressState.InProgress)} (is not in {State}). Be sure to call {nameof(Start)} (also after {nameof(Reset)})");
+					throw new InvalidOperationException($"Can't {operation} {nameof(RaProgress)} which is not in {nameof(RaProgressState)} {nameof(RaProgressState.InProgress)} (is now in {State}). Be sure to call {nameof(Start)} (also after {nameof(Reset)})");
 				}
 				return true;
 			}
