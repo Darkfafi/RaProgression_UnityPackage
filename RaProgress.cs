@@ -1,15 +1,17 @@
 ﻿using System;
 using UnityEngine;
+using static RaProgression.IRaProgress;
 
 namespace RaProgression
 {
 	public class RaProgress : IRaProgress
 	{
-		public event Action<IRaProgress> ProgressedEvaluatedEvent;
-		public event Action<IRaProgress> ProgressStartedEvent;
-		public event Action<IRaProgress> ProgressCompletedEvent;
-		public event Action<IRaProgress> ProgressCancelledEvent;
-		public event Action<IRaProgress> ProgressResetEvent;
+		public event Handler ProgressedEvaluatedEvent;
+		public event Handler ProgressStartedEvent;
+		public event Handler ProgressCompletedEvent;
+		public event Handler ProgressCancelledEvent;
+		public event Handler ProgressResetEvent;
+		public event SignalHandler ProgressSignalEvent;
 
 		public float NormalizedValue
 		{
@@ -34,38 +36,44 @@ namespace RaProgression
 			}
 		}
 
-		public RaProgress OnStart(Action<IRaProgress> callback)
+		public RaProgress OnStart(Handler callback)
 		{
 			ProgressStartedEvent += callback;
 			return this;
 		}
 
-		public RaProgress OnEvaluate(Action<IRaProgress> callback)
+		public RaProgress OnEvaluate(Handler callback)
 		{
 			ProgressedEvaluatedEvent += callback;
 			return this;
 		}
 
-		public RaProgress OnCompleted(Action<IRaProgress> callback)
+		public RaProgress OnCompleted(Handler callback)
 		{
 			ProgressCompletedEvent += callback;
 			return this;
 		}
 
-		public RaProgress OnCancelled(Action<IRaProgress> callback)
+		public RaProgress OnCancelled(Handler callback)
 		{
 			ProgressCancelledEvent += callback;
 			return this;
 		}
 
-		public RaProgress OnEnd(Action<IRaProgress> callback)
+		public RaProgress OnEnd(Handler callback)
 		{
 			ProgressCancelledEvent += callback;
 			ProgressCompletedEvent += callback;
 			return this;
 		}
 
-		public RaProgress OnReset(Action<IRaProgress> callback)
+		public RaProgress OnSignal(SignalHandler callback)
+		{
+			ProgressSignalEvent += callback;
+			return this;
+		}
+
+		public RaProgress OnReset(Handler callback)
 		{
 			ProgressResetEvent += callback;
 			return this;
@@ -85,6 +93,11 @@ namespace RaProgression
 			State = RaProgressState.InProgress;
 			ProgressStartedEvent?.Invoke(this);
 			return Evaluate(0f);
+		}
+
+		public void FireSignal(string message, object source)
+		{
+			ProgressSignalEvent?.Invoke(this, message, source);
 		}
 
 		public bool Evaluate(float normalizedValue, bool throwIfNotValid = true)
@@ -143,7 +156,7 @@ namespace RaProgression
 			return true;
 		}
 
-		public void Recycle()
+		public void Recycle(bool clearSignalChannel)
 		{
 			ProgressStartedEvent = null;
 			ProgressedEvaluatedEvent = null;
@@ -151,13 +164,23 @@ namespace RaProgression
 			ProgressCancelledEvent = null;
 			ProgressResetEvent = null;
 
+			if(clearSignalChannel)
+			{
+				ClearSignalChannel();
+			}
+
 			State = RaProgressState.None;
 			NormalizedValue = 0f;
 		}
 
+		public void ClearSignalChannel()
+		{
+			ProgressSignalEvent = null;
+		}
+
 		public void Dispose()
 		{
-			Recycle();
+			Recycle(clearSignalChannel: true);
 		}
 
 		private bool IfNotInProgress(string operation, bool throwException)
